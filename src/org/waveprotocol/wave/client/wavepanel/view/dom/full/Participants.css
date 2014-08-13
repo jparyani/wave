@@ -198,4 +198,5 @@ img.participant {
   /* The button is a span, to conform to HTML's backward schema. */
   display: inline-block;
   cursor: pointer;
+  visibility: hidden;
 }
