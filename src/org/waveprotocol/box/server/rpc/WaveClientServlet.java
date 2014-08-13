@@ -25,6 +25,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.waveprotocol.box.common.SessionConstants;
 import org.waveprotocol.box.server.CoreSettings;
 import org.waveprotocol.box.server.authentication.SessionManager;
@@ -32,16 +33,39 @@ import org.waveprotocol.box.server.gxp.TopBar;
 import org.waveprotocol.box.server.gxp.WaveClientPage;
 import org.waveprotocol.box.server.util.RandomBase64Generator;
 import org.waveprotocol.box.server.account.AccountData;
+import org.waveprotocol.box.server.persistence.AccountStore;
+import org.waveprotocol.box.server.util.RegistrationUtil;
 import org.waveprotocol.box.server.util.UrlParameters;
 import org.waveprotocol.wave.client.util.ClientFlagsBase;
 import org.waveprotocol.wave.common.bootstrap.FlagConstants;
+import org.waveprotocol.wave.model.wave.InvalidParticipantAddress;
 import org.waveprotocol.wave.model.wave.ParticipantId;
 import org.waveprotocol.wave.util.logging.Log;
+import org.waveprotocol.box.server.account.HumanAccountDataImpl;
+import org.waveprotocol.box.server.authentication.PasswordDigest;
+import org.waveprotocol.box.server.persistence.PersistenceException;
+import com.google.wave.api.WaveService;
+import com.google.wave.api.JsonRpcResponse;
+import org.waveprotocol.box.server.account.RobotAccountData;
+import static org.waveprotocol.box.server.robots.agent.RobotAgentUtil.appendLine;
+import com.google.common.collect.Sets;
+import com.google.wave.api.Wavelet;
+import org.waveprotocol.wave.model.id.WaveId;
+import org.waveprotocol.wave.model.id.WaveletId;
+import com.google.wave.api.JsonRpcConstant.ParamsProperty;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.BufferedWriter;
+import java.io.Writer;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.Reader;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -78,6 +102,7 @@ public class WaveClientServlet extends HttpServlet {
   private final SessionManager sessionManager;
   private final String websocketAddress;
   private final String websocketPresentedAddress;
+  private final AccountStore accountStore;
 
   /**
    * Creates a servlet for the wave client.
@@ -89,7 +114,7 @@ public class WaveClientServlet extends HttpServlet {
       @Named(CoreSettings.HTTP_WEBSOCKET_PUBLIC_ADDRESS) String websocketAddress,
       @Named(CoreSettings.HTTP_WEBSOCKET_PRESENTED_ADDRESS) String websocketPresentedAddress,
       @Named(CoreSettings.ANALYTICS_ACCOUNT) String analyticsAccount,
-      SessionManager sessionManager) {
+      SessionManager sessionManager, AccountStore accountStore) {
     this.domain = domain;
     this.websocketAddress = StringUtils.isEmpty(websocketAddress) ?
         httpAddresses.get(0) : websocketAddress;
@@ -97,6 +122,7 @@ public class WaveClientServlet extends HttpServlet {
         this.websocketAddress : websocketPresentedAddress;
     this.analyticsAccount = analyticsAccount;
     this.sessionManager = sessionManager;
+    this.accountStore = accountStore;
   }
 
   @Override
@@ -108,8 +134,87 @@ public class WaveClientServlet extends HttpServlet {
     // However, public waves aren't implemented yet. For now, we'll just redirect users
     // who haven't signed in to the sign in page.
     if (id == null) {
-      response.sendRedirect(sessionManager.getLoginUrl("/"));
-      return;
+      String username = request.getHeader("X-Sandstorm-Username");
+      String userId = request.getHeader("X-Sandstorm-User-Id");
+
+      if ((username == null || username.isEmpty()) || (userId == null || userId.trim().isEmpty())) {
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "You must be logged into a Sandstorm account to use Wave.");
+        return;
+      }
+      username = username.replace(" ", "_").trim();
+      try {
+        id = RegistrationUtil.checkNewUsername(domain, username);
+      } catch (InvalidParticipantAddress exception) {
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to use Sandstorm username correctly");
+        return;
+      }
+
+      if(!RegistrationUtil.doesAccountExist(accountStore, id)) {
+        HumanAccountDataImpl account = new HumanAccountDataImpl(id, new PasswordDigest(RandomStringUtils.random(64).toCharArray()));
+        try {
+          accountStore.putAccount(account);
+        } catch (PersistenceException e) {
+          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to create new Sandstorm user");
+          return;
+        }
+      }
+
+      RobotAccountData robotAccount = null;
+      String rpcUrl = "http://localhost:9898" + "/robot/rpc";
+      String robotId = "welcome-bot";
+      try {
+        robotAccount = accountStore.getAccount(ParticipantId.ofUnsafe(robotId + "@" + domain)).asRobot();
+      } catch (PersistenceException e) {
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Cannot fetch account data for robot");
+        return;
+      }
+
+      if (robotAccount == null) {
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to fetch account data for robot");
+        return;
+      }
+
+      WaveService waveService = new WaveService(Long.toHexString(1));
+      waveService.setupOAuth(robotAccount.getId().getAddress(), robotAccount.getConsumerSecret(), rpcUrl);
+      File waveIdFile = new File("/var/mainWave.txt");
+      String waveId;
+
+      if(waveIdFile.exists()) {
+        BufferedReader reader = new BufferedReader(new FileReader(waveIdFile));
+        waveId = reader.readLine();
+        reader.close();
+        Wavelet wave = waveService.fetchWavelet(WaveId.deserialise(waveId), WaveletId.of("sandstorm", "conv+root"), rpcUrl);
+        wave.getParticipants().add(id.getAddress());
+        waveService.submit(wave, rpcUrl);
+      } else {
+        Wavelet newWelcomeWavelet = waveService.newWave(domain, Sets.newHashSet(id.getAddress()));
+
+        appendLine(newWelcomeWavelet.getRootBlip(), "Welcome to " + domain + "!");
+        List<JsonRpcResponse> responses = waveService.submit(newWelcomeWavelet, rpcUrl);
+        waveId = responses.get(0).getData().get(ParamsProperty.WAVE_ID).toString();
+
+        Writer writer = null;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(
+                  new FileOutputStream(waveIdFile), "utf-8"));
+            writer.write(waveId);
+            writer.write("\n");
+        } catch (IOException ex) {
+          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to write waveId to file");
+          return;
+        } finally {
+           try {writer.close();} catch (Exception ex) {}
+        }
+      }
+      // TODO: check userId
+
+      HttpSession session = request.getSession(true);
+      sessionManager.setLoggedInUser(session, id);
+
+      if (request.getContextPath().isEmpty()) {
+        response.sendRedirect(request.getRequestURL().toString() + "waveref/" + waveId);
+        return;
+      }
     }
 
     AccountData account = sessionManager.getLoggedInAccount(request.getSession(false));
