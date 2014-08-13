@@ -73,6 +73,11 @@
           z-index: 1;
         }
 
+        #signout {
+          visibility: hidden;
+          font-size: 0;
+        }
+
         .logo {
           /* Logo image is 30px high.  1px padding brings it to 32px, which is the topbar height. */
           padding: 1px;
