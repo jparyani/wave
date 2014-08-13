@@ -158,6 +158,7 @@ public class WaveClientServlet extends HttpServlet {
           return;
         }
       }
+      // TODO: check userId
 
       RobotAccountData robotAccount = null;
       String rpcUrl = "http://localhost:9898" + "/robot/rpc";
@@ -206,13 +207,14 @@ public class WaveClientServlet extends HttpServlet {
            try {writer.close();} catch (Exception ex) {}
         }
       }
-      // TODO: check userId
 
       HttpSession session = request.getSession(true);
       sessionManager.setLoggedInUser(session, id);
 
       if (request.getContextPath().isEmpty()) {
-        response.sendRedirect(request.getRequestURL().toString() + "waveref/" + waveId);
+        response.addHeader("Location", "/#" + waveId);
+        response.setStatus(302);
+        // Can't use response.sendRedirect, since it drops https
         return;
       }
     }
