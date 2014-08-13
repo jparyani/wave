@@ -220,14 +220,6 @@ public final class ParticipantController {
     // it.
     final ProfilePopupView profileView = participantView.showParticipation();
     ProfilePopupPresenter profileUi = ProfilePopupPresenter.create(profile, profileView, profiles);
-    profileUi.addControl(EscapeUtils.fromSafeConstant(messages.remove()), new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        participation.first.removeParticipant(participation.second);
-        // The presenter is configured to destroy itself on view hide.
-        profileView.hide();
-      }
-    });
     profileUi.show();
   }
 }
