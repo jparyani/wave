@@ -89,9 +89,6 @@
         <g:south size="200">
           <d:DebugMessagePanel ui:field="logPanel" addStyleNames="{style.debugPanel}" />
         </g:south>
-        <g:west size="400">
-          <s:SearchPanelWidget ui:field="searchPanel" addStyleNames="{style.searchPanel}"/>
-        </g:west>
         <g:center>
           <f:FramedPanel ui:field="waveFrame" addStyleNames="{style.wavePanel}">
             <w:ImplPanel ui:field="waveHolder" addStyleNames="{style.waveHolder}"/>

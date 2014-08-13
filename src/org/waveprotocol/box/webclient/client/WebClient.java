@@ -143,9 +143,6 @@ public class WebClient implements EntryPoint {
   ImplPanel waveHolder;
   private final Element loading = new LoadingIndicator().getElement();
 
-  @UiField(provided = true)
-  final SearchPanelWidget searchPanel = new SearchPanelWidget(new SearchPanelRenderer(profiles));
-
   @UiField
   DebugMessagePanel logPanel;
 
@@ -218,7 +215,6 @@ public class WebClient implements EntryPoint {
     // sticks inline styles on elements without permission. They must be
     // cleared.
     self.getElement().getStyle().clearPosition();
-    splitPanel.setWidgetMinSize(searchPanel, 300);
     AttachmentManagerProvider.init(AttachmentManagerImpl.getInstance());
 
     if (LogLevel.showDebug()) {
@@ -227,28 +223,9 @@ public class WebClient implements EntryPoint {
       logPanel.removeFromParent();
     }
 
-    setupSearchPanel();
     setupWavePanel();
 
     FocusManager.init();
-  }
-
-  private void setupSearchPanel() {
-    // On wave action fire an event.
-    SearchPresenter.WaveActionHandler actionHandler =
-        new SearchPresenter.WaveActionHandler() {
-          @Override
-          public void onCreateWave() {
-            ClientEvents.get().fireEvent(new WaveCreationEvent());
-          }
-
-          @Override
-          public void onWaveSelected(WaveId id) {
-            ClientEvents.get().fireEvent(new WaveSelectionEvent(WaveRef.of(id)));
-          }
-        };
-    Search search = SimpleSearch.create(RemoteSearchService.create(), waveStore);
-    SearchPresenter.create(search, searchPanel, actionHandler, profiles);
   }
 
   private void setupWavePanel() {
