@@ -63,9 +63,7 @@ public class NotifyOperationService implements OperationService {
     String capabilitiesHash =
         OperationUtil.getRequiredParameter(operation, ParamsProperty.CAPABILITIES_HASH);
 
-    RobotName robotName = RobotName.fromAddress(participant.getAddress());
-
-    ParticipantId robotAccountId = ParticipantId.ofUnsafe(robotName.toEmailAddress());
+    ParticipantId robotAccountId = participant;
     AccountData account;
     try {
       account = accountStore.getAccount(robotAccountId);
