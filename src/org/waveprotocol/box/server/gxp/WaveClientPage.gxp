@@ -46,7 +46,7 @@
       <!-- Session variables. -->
       <script type="text/javascript" language="javascript">
         var __session = <gxp:eval expr='sessionJson' />;
-        var __websocket_address = <gxp:eval expr='websocketAddress' />;
+        var __websocket_address = location.host;
         var __client_flags = <gxp:eval expr='clientFlags' />;
       </script>
       <style type="text/css">
