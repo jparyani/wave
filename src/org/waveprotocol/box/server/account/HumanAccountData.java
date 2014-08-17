@@ -43,6 +43,8 @@ public interface HumanAccountData extends AccountData {
    */
   PasswordDigest getPasswordDigest();
 
+  String getUserId();
+
   /**
    * Gets user's locale.
    *

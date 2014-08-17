@@ -137,8 +137,11 @@ public class WaveClientServlet extends HttpServlet {
       String username = request.getHeader("X-Sandstorm-Username");
       String userId = request.getHeader("X-Sandstorm-User-Id");
 
-      if ((username == null || username.isEmpty()) || (userId == null || userId.trim().isEmpty())) {
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "You must be logged into a Sandstorm account to use Wave.");
+      if (userId == null) {
+        userId = "";
+      }
+      if (username == null || username.isEmpty()) {
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "You must be logged into a Sandstorm account with a username to use Wave.");
         return;
       }
       username = username.replace(" ", "_").trim();
@@ -149,16 +152,37 @@ public class WaveClientServlet extends HttpServlet {
         return;
       }
 
-      if(!RegistrationUtil.doesAccountExist(accountStore, id)) {
-        HumanAccountDataImpl account = new HumanAccountDataImpl(id, new PasswordDigest(RandomStringUtils.random(64).toCharArray()));
+      AccountData account;
+      int accountTry = 2;
+      while (true) {
+        account = null;
         try {
-          accountStore.putAccount(account);
-        } catch (PersistenceException e) {
-          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to create new Sandstorm user");
+          account = accountStore.getAccount(id);
+          if (account != null && account.asHuman().getUserId().equals(userId)) {
+            break;
+          }
+        } catch (PersistenceException e) { }
+
+        if (account == null) {
+          account = new HumanAccountDataImpl(id, new PasswordDigest(RandomStringUtils.random(64).toCharArray()), userId);
+          try {
+            accountStore.putAccount(account);
+            break;
+          } catch (PersistenceException ex) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to create new Sandstorm user");
+            return;
+          }
+        }
+
+        try {
+          id = RegistrationUtil.checkNewUsername(domain, username + accountTry);
+        } catch (InvalidParticipantAddress ex) {
+          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to use Sandstorm username correctly");
           return;
         }
+
+        accountTry++;
       }
-      // TODO: check userId
 
       RobotAccountData robotAccount = null;
       String rpcUrl = "http://localhost:9898" + "/robot/rpc";

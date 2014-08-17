@@ -33,6 +33,7 @@ import org.waveprotocol.wave.model.wave.ParticipantId;
 public final class HumanAccountDataImpl implements HumanAccountData {
   private final ParticipantId id;
   private final PasswordDigest passwordDigest;
+  private final String userId;
   private String locale;
 
   /**
@@ -56,10 +57,16 @@ public final class HumanAccountDataImpl implements HumanAccountData {
    *        obtained by calling {@code new PasswordDigest(password_chars);}
    */
   public HumanAccountDataImpl(ParticipantId id, PasswordDigest passwordDigest) {
+    this(id, passwordDigest, "");
+  }
+
+  public HumanAccountDataImpl(ParticipantId id, PasswordDigest passwordDigest, String userId) {
     Preconditions.checkNotNull(id, "Id can not be null");
+    Preconditions.checkNotNull(userId, "userId can not be null");
 
     this.id = id;
     this.passwordDigest = passwordDigest;
+    this.userId = userId;
   }
 
   @Override
@@ -70,6 +77,11 @@ public final class HumanAccountDataImpl implements HumanAccountData {
   @Override
   public PasswordDigest getPasswordDigest() {
     return passwordDigest;
+  }
+
+  @Override
+  public String getUserId() {
+    return userId;
   }
 
   @Override

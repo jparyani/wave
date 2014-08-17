@@ -47,6 +47,7 @@ message ProtoAccountData {
 // Data specific to a human account
 message ProtoHumanAccountData {
 	optional ProtoPasswordDigest password_digest = 1;
+	optional string user_id = 2;
 }
 
 // The values from a PAsswordDigest instance

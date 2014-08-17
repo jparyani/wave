@@ -77,6 +77,7 @@ public class ProtoAccountDataSerializer {
     ProtoHumanAccountData.Builder builder = ProtoHumanAccountData.newBuilder();
     if (account.getPasswordDigest() != null) {
       builder.setPasswordDigest(serialize(account.getPasswordDigest()));
+      builder.setUserId(account.getUserId());
     }
     return builder.build();
   }
@@ -144,7 +145,9 @@ public class ProtoAccountDataSerializer {
 
   private static HumanAccountData deserialize(String account_id, ProtoHumanAccountData data) {
     ParticipantId id = ParticipantId.ofUnsafe(account_id);
-    if (data.hasPasswordDigest()) {
+    if (data.hasUserId() && data.hasPasswordDigest()) {
+      return new HumanAccountDataImpl(id, deserialize(data.getPasswordDigest()), data.getUserId());
+    } else if (data.hasPasswordDigest()) {
       return new HumanAccountDataImpl(id, deserialize(data.getPasswordDigest()));
     } else {
       return new HumanAccountDataImpl(id);
