@@ -71,7 +71,7 @@
     <span class="{style.alert}">
       <em><ui:text from="{msg.everythingShiny}"/></em>
       <ui:text from="{msg.errorHasOccurred}"/>. <ui:text from="{msg.please}"/>
-      <a href="#" onclick="window.location.replace(window.location.href.replace(/#.*/, ''));">
+      <a href="#" onclick="window.location.reload();">
       <ui:text from="{msg.refreshPage}"/></a>.
       <gwt:Anchor href="javascript:;" ui:field="showDetail" visible="false">
         <ui:text from="{msg.showErrorDetail}"/>.
