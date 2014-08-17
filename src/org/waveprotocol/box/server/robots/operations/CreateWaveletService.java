@@ -42,6 +42,8 @@ import org.waveprotocol.wave.model.id.WaveletName;
 import org.waveprotocol.wave.model.wave.InvalidParticipantAddress;
 import org.waveprotocol.wave.model.wave.ParticipantId;
 import org.waveprotocol.wave.model.wave.opbased.OpBasedWavelet;
+import org.waveprotocol.wave.model.document.util.LineContainers;
+import org.waveprotocol.wave.model.document.util.XmlStringBuilder;
 
 import java.util.List;
 
@@ -84,7 +86,8 @@ public class CreateWaveletService implements OperationService {
     List<ParticipantId> participants = Lists.newArrayList(participant);
     for (String address : waveletData.getParticipants()) {
       try {
-        participants.add(ParticipantId.of(address));
+        participant = ParticipantId.of(address);
+        participants.add(participant);
       } catch (InvalidParticipantAddress e) {
         throw new InvalidRequestException(
             address + " is not a valid participant address", operation);
@@ -116,6 +119,8 @@ public class CreateWaveletService implements OperationService {
       throw new InvalidRequestException("Invalid id", operation, e);
     }
     context.putBlip(waveletData.getRootBlipId(), rootBlip);
+    XmlStringBuilder builder = XmlStringBuilder.createText("Welcome to Sandstorm's Wave in a Box app. Please edit this wavelet to get started.");
+    LineContainers.appendToLastLine(rootBlip.getContent(), builder);
 
     String message = OperationUtil.getOptionalParameter(operation, ParamsProperty.MESSAGE);
     WaveletCreatedEvent event =

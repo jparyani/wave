@@ -214,7 +214,6 @@ public class WaveClientServlet extends HttpServlet {
       } else {
         Wavelet newWelcomeWavelet = waveService.newWave(domain, Sets.newHashSet(id.getAddress()));
 
-        appendLine(newWelcomeWavelet.getRootBlip(), "Welcome to " + domain + "!");
         List<JsonRpcResponse> responses = waveService.submit(newWelcomeWavelet, rpcUrl);
         waveId = responses.get(0).getData().get(ParamsProperty.WAVE_ID).toString();
 
