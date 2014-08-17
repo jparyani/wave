@@ -178,9 +178,6 @@ public class EditToolbar {
     createRemoveLinkButton(group);
 
     group = toolbarUi.addGroup();
-    createInsertGadgetButton(group, user);
-
-    group = toolbarUi.addGroup();
     createInsertAttachmentButton(group, user);
   }
 
