@@ -82,6 +82,12 @@
       left: 0;
       right: 0;
     }
+
+    img[title="Welcome-bot"] {
+      visibility: hidden !important;
+      width: 0px !important;
+      height: 0px !important;
+    }
   </ui:style>
   <g:DockLayoutPanel unit="PX" styleName="{style.root}">
     <g:center>
