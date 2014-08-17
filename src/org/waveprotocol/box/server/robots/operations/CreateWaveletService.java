@@ -119,7 +119,7 @@ public class CreateWaveletService implements OperationService {
       throw new InvalidRequestException("Invalid id", operation, e);
     }
     context.putBlip(waveletData.getRootBlipId(), rootBlip);
-    XmlStringBuilder builder = XmlStringBuilder.createText("Welcome to Sandstorm's Wave in a Box app. Please edit this wavelet to get started.");
+    XmlStringBuilder builder = XmlStringBuilder.createText("Click \"Edit\" to begin.");
     LineContainers.appendToLastLine(rootBlip.getContent(), builder);
 
     String message = OperationUtil.getOptionalParameter(operation, ParamsProperty.MESSAGE);
