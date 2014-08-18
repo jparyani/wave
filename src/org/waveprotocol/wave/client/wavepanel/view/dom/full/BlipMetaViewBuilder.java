@@ -92,8 +92,7 @@ public final class BlipMetaViewBuilder implements UiBuilder, IntrinsicBlipMetaVi
   public static final String OPTION_SELECTED_ATTRIBUTE = "s";
   private static final EnumSet<MenuOption> MENU_OPTIONS_BEFORE_EDITING = EnumSet.of(
       IntrinsicBlipMetaView.MenuOption.REPLY, IntrinsicBlipMetaView.MenuOption.DELETE,
-      IntrinsicBlipMetaView.MenuOption.EDIT,
-      IntrinsicBlipMetaView.MenuOption.LINK);
+      IntrinsicBlipMetaView.MenuOption.EDIT);
   public final static Set<MenuOption> ENABLED_WHILE_EDITING_MENU_OPTIONS_SET = EnumSet.of(
       IntrinsicBlipMetaView.MenuOption.EDIT_DONE);
   public final static Set<MenuOption> DISABLED_WHILE_EDITING_MENU_OPTIONS_SET = MENU_OPTIONS_BEFORE_EDITING;
