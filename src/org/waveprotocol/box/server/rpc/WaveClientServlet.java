@@ -87,6 +87,7 @@ import javax.servlet.http.HttpSession;
 @Singleton
 public class WaveClientServlet extends HttpServlet {
 
+  private static final File waveIdFile = new File("/var/mainWave.txt");
   private static final Log LOG = Log.get(WaveClientServlet.class);
 
   private static final HashMap<String, String> FLAG_MAP = Maps.newHashMap();
@@ -201,7 +202,6 @@ public class WaveClientServlet extends HttpServlet {
 
       WaveService waveService = new WaveService(Long.toHexString(1));
       waveService.setupOAuth(robotAccount.getId().getAddress(), robotAccount.getConsumerSecret(), rpcUrl);
-      File waveIdFile = new File("/var/mainWave.txt");
       String waveId;
 
       if(waveIdFile.exists()) {
@@ -233,13 +233,17 @@ public class WaveClientServlet extends HttpServlet {
 
       HttpSession session = request.getSession(true);
       sessionManager.setLoggedInUser(session, id);
+    }
 
-      if (request.getContextPath().isEmpty()) {
-        response.addHeader("Location", "/#" + waveId);
+    String queryString = request.getQueryString();
+    if (queryString == null) {
+        BufferedReader reader = new BufferedReader(new FileReader(waveIdFile));
+        String waveId = reader.readLine();
+        reader.close();
+        response.addHeader("Location", "/?redirect=false#" + waveId);
         response.setStatus(302);
         // Can't use response.sendRedirect, since it drops https
         return;
-      }
     }
 
     AccountData account = sessionManager.getLoggedInAccount(request.getSession(false));
