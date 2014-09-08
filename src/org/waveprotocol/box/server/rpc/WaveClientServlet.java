@@ -145,7 +145,7 @@ public class WaveClientServlet extends HttpServlet {
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "You must be logged into a Sandstorm account with a username to use Wave.");
         return;
       }
-      username = username.replace(" ", "_").trim();
+      username = username.trim().replaceAll("[^a-zA-Z0-9]", "_");
       try {
         id = RegistrationUtil.checkNewUsername(domain, username);
       } catch (InvalidParticipantAddress exception) {
