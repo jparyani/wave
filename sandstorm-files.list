@@ -45,6 +45,8 @@ lib/x86_64-linux-gnu/libkeyutils.so.1
 lib/x86_64-linux-gnu/libkeyutils.so.1.5
 lib/x86_64-linux-gnu/libm-2.19.so
 lib/x86_64-linux-gnu/libm.so.6
+lib/x86_64-linux-gnu/libncurses.so.5
+lib/x86_64-linux-gnu/libncurses.so.5.9
 lib/x86_64-linux-gnu/libnsl-2.19.so
 lib/x86_64-linux-gnu/libnsl.so.1
 lib/x86_64-linux-gnu/libnss_compat-2.19.so
@@ -91,11 +93,13 @@ usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/libawt.so
 usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/libj2pkcs11.so
 usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/libjava.so
 usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/libjavajpeg.so
+usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/libjavalcms.so
 usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/libnet.so
 usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/libnio.so
 usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/libverify.so
 usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/libzip.so
 usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server/libjvm.so
+usr/lib/jvm/java-7-openjdk-amd64/jre/lib/cmm/sRGB.pf
 usr/lib/jvm/java-7-openjdk-amd64/jre/lib/content-types.properties
 usr/lib/jvm/java-7-openjdk-amd64/jre/lib/currency.data
 usr/lib/jvm/java-7-openjdk-amd64/jre/lib/ext
@@ -139,7 +143,7 @@ usr/lib/x86_64-linux-gnu/libgmodule-2.0.so.0.4000.0
 usr/lib/x86_64-linux-gnu/libgmp.so.10
 usr/lib/x86_64-linux-gnu/libgmp.so.10.2.0
 usr/lib/x86_64-linux-gnu/libgnutls-deb0.so.28
-usr/lib/x86_64-linux-gnu/libgnutls-deb0.so.28.30.7
+usr/lib/x86_64-linux-gnu/libgnutls-deb0.so.28.40.0
 usr/lib/x86_64-linux-gnu/libgobject-2.0.so.0
 usr/lib/x86_64-linux-gnu/libgobject-2.0.so.0.4000.0
 usr/lib/x86_64-linux-gnu/libgssapi_krb5.so.2
@@ -154,6 +158,8 @@ usr/lib/x86_64-linux-gnu/libkrb5.so.3
 usr/lib/x86_64-linux-gnu/libkrb5.so.3.3
 usr/lib/x86_64-linux-gnu/libkrb5support.so.0
 usr/lib/x86_64-linux-gnu/libkrb5support.so.0.1
+usr/lib/x86_64-linux-gnu/liblcms2.so.2
+usr/lib/x86_64-linux-gnu/liblcms2.so.2.0.6
 usr/lib/x86_64-linux-gnu/libnettle.so.4
 usr/lib/x86_64-linux-gnu/libnettle.so.4.7
 usr/lib/x86_64-linux-gnu/libnspr4.so
@@ -168,7 +174,7 @@ usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6
 usr/lib/x86_64-linux-gnu/libstdc++.so.6
 usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.20
 usr/lib/x86_64-linux-gnu/libtasn1.so.6
-usr/lib/x86_64-linux-gnu/libtasn1.so.6.3.0
+usr/lib/x86_64-linux-gnu/libtasn1.so.6.3.2
 usr/lib/x86_64-linux-gnu/nss/libfreebl3.so
 usr/lib/x86_64-linux-gnu/nss/libsoftokn3.so
 usr/share/java/java-atk-wrapper.jar
@@ -176,6 +182,7 @@ usr/share/javazi/America/Los_Angeles
 war/static/favicon.ico
 war/static/images/unknown.jpg
 war/static/logo.png
+war/webclient/C03CF0FE736A3024C43714A951528251.cache.html
 war/webclient/gwt/chrome/chrome.css
 war/webclient/gwt/chrome/images/hborder.png
 war/webclient/gwt/chrome/images/splitPanelThumb.png
